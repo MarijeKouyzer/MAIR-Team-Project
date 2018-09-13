@@ -16,7 +16,7 @@ def write_to_dialogue_list(dialogue: str):
 
 def write_dialogue_list_to_file():
     dialogues_as_text = json.dumps(dialogues)
-    with open("", "rw") as f:
+    with open("dialogues.json", "rw") as f:
         f.write(dialogues_as_text)
         f.close()
 
