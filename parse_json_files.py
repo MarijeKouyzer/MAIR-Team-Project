@@ -25,9 +25,10 @@ if not os.path.isdir(out_cwd):
     sys.exit("The out path was not a dir. Please check your variables and try again!")
 
 
-def main():
+def parse_json_files():
     iterate_over_folders(read_json_files)
     write_dialogue_list_to_file()
+    print("Dialogues file created")
 
 
 def write_to_dialogue_list(dialogue: str):
@@ -94,5 +95,11 @@ def iterate_over_folders(node_function, parent_dir="", path=cwd):
             iterate_over_folders(read_json_files, name, new_path)
 
 
-main()
-print("Dialogues file created")
+def show_dialogues():
+    for dialogue in dialogues:
+        print(dialogue)
+        input("Press Enter to view the next dialogue...\n")
+
+
+parse_json_files()
+show_dialogues()
