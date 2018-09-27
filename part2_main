@@ -1,0 +1,249 @@
+import os
+import argparse
+import sys
+from re import match
+from random import shuffle
+import json
+import re
+
+dialogues = []
+handled_sessions = []
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--dstc2_dir", "-d",
+                    help="Directory of the extracted tar.gz",
+                    type=str,
+                    default=os.getcwd())
+parser.add_argument("--out", "-o",
+                    help="Directory for the dialogues json file",
+                    type=str,
+                    default=os.getcwd())
+args = parser.parse_args()
+cwd = args.dstc2_dir
+out_cwd = args.out
+if not os.path.isdir(cwd):
+    sys.exit("The dstc2_dir was not a dir. Please check your variables and try again!")
+if not os.path.isdir(out_cwd):
+    sys.exit("The out path was not a dir. Please check your variables and try again!")
+
+
+def main():
+    iterate_over_folders(read_json_files)
+    write_dialogue_list_to_file()
+    do_part_two()
+
+
+def count_words_in_str(str):
+    return len(re.findall("[a-zA-Z_]+", str))
+
+
+def count_numbers_in_str(str):
+    return len(re.findall("[0-9]+", str))
+
+
+def look_up_dictionary(word,dictionary):
+    value = 0
+    i = 0
+    # print("dic len ", len(dictionary))
+    while i < len(dictionary):
+        if word == dictionary[i][0]:
+            # print("Word found in dictionary, key =", dictionary[i][1])
+            value = dictionary[i][1]
+            break
+        i += 1
+
+    return value
+
+
+def convert_lines(line_list,dictionary,max_length):
+    list_length = len(line_list)
+    converted_lines = list()
+    # print(line_list)
+    # print(line_list[0])
+    # print(type(line_list[0]))
+    print(dictionary)
+    # print(dictionary[0])
+    # print(dictionary[0][0])
+    global converted_line
+    i = 0
+    while i < list_length:
+        line = line_list[i]
+        converted_line = ""
+        words_in_line = line.split()
+        # print(line)
+        line_length = count_words_in_str(line)
+        # print("line_length",line_length)
+
+        j = 0
+        while j < line_length:
+            # print(words_in_line[j])
+            if j > max_length - 1:
+                # If too long then cut off the converted line
+                # print("Out of limit")
+                break
+            else:
+                converted_line += str(look_up_dictionary(words_in_line[j],dictionary)) + " "
+
+            if j == line_length - 1 or j == max_length -1 :
+                # If too short add special padding tokens (for now using the number 1)
+                nums = count_numbers_in_str(converted_line)
+                k = 0
+                while k< max_length - nums:
+                    converted_line += str(1) + " "
+                    k += 1
+            j += 1
+
+        # print(converted_line)
+        converted_lines.append(converted_line)
+
+        i += 1
+
+    return converted_lines
+
+
+def make_dictionary(train_linelist, max_vocabulary):
+    # Create our own dictionary
+
+    # print(train_linelist)
+    train_data = " ".join(train_linelist)
+    # print(train_data)
+
+    word_counter = {}
+    for word in train_data.split():
+        if word not in word_counter:
+            word_counter[word] = 1
+        else:
+            word_counter[word] += 1
+
+    # print(type(word_counter))
+    # print(word_counter)
+    word_counter = sorted(word_counter.items(), key=lambda x: x[1], reverse=True)
+    # print(word_counter)
+    i = 0
+    while i < len(word_counter):
+        word_counter[i] = list(word_counter[i])
+        i += 1
+    # print(word_counter)
+    # print(type(dictionary))
+    # print(word_counter[2])
+    # print(word_counter[40][1])
+    # print("Word counter len: ", len(word_counter))
+    # print("Max vocabulary: ", max_vocabulary)
+
+    if len(word_counter) <= max_vocabulary:
+        dictionary = word_counter
+        i = 0
+        while i < len(word_counter):
+            dictionary[i][1] = i+1
+            i += 1
+
+    elif len(word_counter) > max_vocabulary:
+        dictionary = word_counter[0:max_vocabulary]
+        i = 0
+        while i < max_vocabulary:
+            dictionary[i][1] = i+1
+            i += 1
+
+    # print(dictionary)
+    return dictionary
+
+
+def do_part_two():
+    # Read lines
+    file_object = open("lines.txt", "r", 1)
+    lines = file_object.read().splitlines()
+    file_object.close()
+    # print(lines)
+
+    # Shuffle and split
+    shuffle(lines)
+    train_linelist = lines[0: int(len(lines) * .85)]
+    test_linelist = lines[int(len(lines) * .85): int(len(lines))]
+    # print(lines)
+    # print(train_linelist)
+    # print(test_linelist)
+    dictionary = make_dictionary(train_linelist, max_vocabulary=20)
+    converted_list = convert_lines(train_linelist, dictionary,  8)
+    print(converted_list)
+
+
+def write_lines_file(lines):
+    lines_file = open("lines.txt", "ab")
+    lines_file.write(bytes(lines, 'utf-8'))
+    lines_file.close()
+
+
+def write_to_dialogue_list(dialogue: str):
+    dialogues.append(dialogue)
+
+
+def write_dialogue_list_to_file():
+    dialogues_as_text = json.dumps(dialogues)
+    with open(os.path.join(out_cwd, "dialogues.json"), "w") as f:
+        f.write(dialogues_as_text)
+        f.close()
+
+
+def read_json_files(write_function, path: str):
+    label_path = os.path.join(path, "label.json")
+    log_path = os.path.join(path, "log.json")
+
+    if not os.path.isfile(log_path):
+        return
+
+    if not os.path.isfile(label_path):
+        return
+
+    # Load the json objects from the files
+    json_file = open(label_path, "r", encoding="utf-8")
+    label = json.load(json_file)
+    json_file.close()
+
+    json_file = open(log_path, "r", encoding="utf-8")
+    log = json.load(json_file)
+    json_file.close()
+
+    # Make an opening for the dialogue
+    dialogue = ""
+    dialogue += "session id: " + log["session-id"] + "\n"
+    dialogue += label["task-information"]["goal"]["text"] + "\n"
+    # Make an opening for the lines
+    lines = ""
+
+    # Go through each turn and show the system and the user turns
+    for i, system_turn in enumerate(log["turns"]):
+        user_turn = label["turns"][i]
+        readable_system = "system: " + system_turn["output"]["transcript"] + "\n"
+        readable_user = "user: " + user_turn["transcription"] + "\n"
+        dialogue += readable_system + readable_user
+        #  Make utterance in the form of  [speech act] [utterance content]
+        cam = user_turn["semantics"]["cam"]
+        speech_act = cam.split('(')[0]
+        line = speech_act + " " + user_turn["transcription"] + "\n"
+        lines += line
+
+    # Write the dialogue to the list
+    write_function(dialogue)
+    write_lines_file(lines)
+
+
+def directory_name_is_identifier(name):
+    return match(r"voip-.*", name) is not None
+
+
+def iterate_over_folders(node_function, parent_dir="", path=cwd):
+    # Go over all files in the folder
+    for name in os.listdir(path):
+        # Make sure that a dialogue is only created once per session id
+        if directory_name_is_identifier(parent_dir) and parent_dir not in handled_sessions:
+            handled_sessions.append(parent_dir)
+            node_function(write_to_dialogue_list, path)
+        # If the parent_dir was not a dialogue id and the item is a directory
+        elif os.path.isdir(os.path.join(path, name)):
+            # Update the path
+            new_path = os.path.join(path, name)
+            iterate_over_folders(read_json_files, name, new_path)
+
+
+main()
+print("Dialogues file created!")
