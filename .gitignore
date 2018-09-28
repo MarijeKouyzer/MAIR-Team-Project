@@ -104,3 +104,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+dialogues.json
+utterances
+dstc2_traindev
