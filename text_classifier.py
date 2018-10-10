@@ -11,7 +11,7 @@ class TextClassifier:
         self.main_input = Input(shape=(sequence_length,),
                                 dtype='int32',
                                 name='main_input')
-        x = Embedding(output_dim=512,
+        x = Embedding(output_dim=516,
                       input_dim=vocabulary_size,
                       input_length=sequence_length,
                       mask_zero=True)(self.main_input)
@@ -33,12 +33,12 @@ class TextClassifier:
                            metrics=['accuracy'])
         self.model.fit(input_list,
                        to_categorical(output_list),
-                       batch_size=32,
+                       batch_size=64,
                        epochs=10,
                        verbose=1)
 
     def evaluate(self, input_list: array, output_list: array):
-        self.model.evaluate(input_list, to_categorical(output_list), verbose=1)
+        return self.model.evaluate(input_list, to_categorical(output_list), verbose=1)
 
     def predict_speech_act(self, x_input: array):
         return self.model.predict(x_input)[0]

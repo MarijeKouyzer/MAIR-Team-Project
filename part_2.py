@@ -70,16 +70,19 @@ text_classifier.train(
     word_to_integer_converter.convert_list(training_utterances_list),
     speech_act_to_vector_converter.convert_list(training_speech_act_list)
 )
-text_classifier.evaluate(
+
+# Test the classifier
+loss, acc = text_classifier.evaluate(
     word_to_integer_converter.convert_list(test_utterances_list),
     speech_act_to_vector_converter.convert_list(test_speech_act_list)
 )
+print("Test loss: " + loss)
+print("Test accuracy: " + acc)
 
 # Wait for input
 while True:
     user_text = input("Enter text to evaluate: ")
     predicted_vector = text_classifier.predict_speech_act(array([word_to_integer_converter.convert_line(user_text)]))
-    print(argmax(predicted_vector))
     predicted_integer: int = argmax(predicted_vector)
     textual_speech_act = speech_act_to_vector_converter.convert_to_speech_act(predicted_integer)
     print(textual_speech_act)
