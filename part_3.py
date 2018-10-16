@@ -1,31 +1,35 @@
+def remove_brackets(word):
+    return_word = word
+    if word[0] == "(":
+        return_word = return_word[1::]
+    if word[-len(word)] == ")":
+        return_word = return_word[::-1]
+    return return_word
+
+
 class Node:
     text: str
     type: str
     children: list = []
     parent = None
+    return_type = ""
 
     def add_child(self, child):
         self.children.append(child)
 
     def is_compatible_with(self, right):
-        right__type_split = right.type.split("\\")
-        expected_left_type = right__type_split[-len(right__type_split)]
+        right__type_split = right.type.rsplit("\\", 1)
+        expected_left_type = right__type_split[0]
         if self.type == expected_left_type:
+            self.return_type = remove_brackets(right__type_split[1])
             return True
-        left__type_split = self.type.split("/")
-        expected_right_type = left__type_split[-len(left__type_split)]
-        if right.type == expected_right_type:
-            return True
+        left__type_split = self.type.rsplit("/", 1)
+        if len(left__type_split) == 2:
+            expected_right_type = left__type_split[1]
+            if right.type == expected_right_type:
+                self.return_type = remove_brackets(expected_right_type[0])
+                return True
         return False
-
-    @property
-    def return_type(self) -> str:
-        i = 0
-        for c in reversed(self.type):
-            if c == "/" or c == "\\":
-                return self.type[::-i]
-            i += 1
-        return ""
 
     def print(self):
         print(self.type + "\n")
@@ -35,16 +39,26 @@ class Node:
 
 
 rules = {
-
+    'i': "np",
+    "want": "(np\s)/np",
+    "a": "np/np",
+    "restaurant": "np",
+    "serving": "(s\s)/np",
+    "swedish": "np/np",
+    "food": "np"
 }
 variable_types = {
     "area": {
         "keywords": ["town", "of"],
-        "words": ["east", "west", "north", "south"]
+        "words": ["east", "west", "north", "south", "centre"]
     },
     "price_range": {
-        "keywords": ["restaurant"],
-        "words": []
+        "keywords": ["restaurant", "price"],
+        "words": ["moderate", "expensive", "cheap"]
+    },
+    "food": {
+        "keywords": ["restaurant", "serves", "serving", "food"],
+        "words": ["thai", "turkish", "european", "catalan", "mediterranean", "seafood", "british", "modern european", "italian", "romanian", "chinese", "steakhouse", "asian oriental", "french", "portuguese", "indian", "spanish", "vietnamese", "korean", "moroccan", "swiss", "fusion", "gastropub", "tuscun", "international", "traditional", "mediterranean", "poynesian", "african", "turkish", "bistro", "north american", "australasian", "persian", "jamaican", "lebanese", "cubun", "japenese", "catalan"]
     }
 }
 variable_nodes = dict()
@@ -55,15 +69,18 @@ def evaluate_word_list(nodes: list) -> Node:
     new_nodes = list()
     i = 0
     for node in nodes:
-        if nodes[i+1] and node.is_compatible_with(nodes[i+1]):
-            new_node = Node()
-            new_node.type = node.return_type
-            new_node.text = node.text + " " + node[i+1].text
-            new_node.children.append(node)
-            new_node.children.append(nodes[i+1])
-            node.parent = new_node
-            node[i+1].parent = new_node
-            new_nodes.append(new_node)
+        if i != len(nodes):
+            if node.is_compatible_with(nodes[i+1]):
+                new_node = Node()
+                new_node.type = node.return_type
+                new_node.text = node.text + " " + nodes[i+1].text
+                new_node.children.append(node)
+                new_node.children.append(nodes[i+1])
+                node.parent = new_node
+                nodes[i+1].parent = new_node
+                new_nodes.append(new_node)
+            else:
+                new_nodes.append(node)
         else:
             new_nodes.append(node)
         i += 1
@@ -83,7 +100,7 @@ def build_tree(text: str) -> Node:
     for word in word_list:
         word_node = Node()
         word_node.text = word
-        if rules[word]:
+        if word in rules.keys():
             word_node.type = rules[word]
         else:
             word_node.type = "np"
