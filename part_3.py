@@ -27,11 +27,17 @@ class Node:
             i += 1
         return ""
 
+    def print(self):
+        print(self.type + "\n")
+        print(self.text + "\n")
+        for child in self.children:
+            child.print()
+
 
 rules = {
 
 }
-variable_nodes = []
+variable_nodes = dict()
 variable_types = {
     "area": {
         "keywords": ["town", "of"],
@@ -88,7 +94,7 @@ def find_variables_in_branch(node, variable_type):
     # Node is a leaf
     if len(node.children) == 0:
         if node.text in variable_types[variable_type]["words"]:
-            variable_nodes.append(node)
+            variable_nodes[variable_type] = node
     # If not, continue to the children
     else:
         for child in node.children:
@@ -118,5 +124,13 @@ def traverse_tree(node):
 while True:
     user_text = input("Enter text to evaluate: ")
     root_node = build_tree(user_text)
-    variable_nodes = []
+    variable_nodes = dict()
     traverse_tree(root_node)
+    root_node.print()
+    print("\nVARIABLES\n")
+    print("---------\n")
+    print("---------")
+    for key, value in variable_nodes.items():
+        print("---------\n")
+        print(key + "\n")
+        value.print()
