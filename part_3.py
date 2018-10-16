@@ -107,9 +107,9 @@ def traverse_tree(node):
     # See if there are multiple variable types in the sub(tree)
     variable_types_in_text = list()
     word_list = node.text.split(" ")
-    for variable_type, value in variable_types.items():
+    for variable_type, v_value in variable_types.items():
         for word in word_list:
-            if word in value["keywords"]:
+            if word in v_value["keywords"]:
                 variable_types_in_text.append(variable_types)
     if len(variable_types_in_text) == 1:
         # The node is a node containing a single type of variable
@@ -129,7 +129,8 @@ while True:
     variable_nodes = dict()
     traverse_tree(root_node)
     root_node.print()
-    print("\nVARIABLES\n")
+    print("\n---------\n")
+    print("VARIABLES\n")
     print("---------\n")
     print("---------")
     for key, value in variable_nodes.items():
