@@ -37,7 +37,6 @@ class Node:
 rules = {
 
 }
-variable_nodes = dict()
 variable_types = {
     "area": {
         "keywords": ["town", "of"],
@@ -48,6 +47,7 @@ variable_types = {
         "words": []
     }
 }
+variable_nodes = dict()
 
 
 def evaluate_word_list(nodes: list) -> Node:
@@ -64,6 +64,8 @@ def evaluate_word_list(nodes: list) -> Node:
             node.parent = new_node
             node[i+1].parent = new_node
             new_nodes.append(new_node)
+        else:
+            new_nodes.append(node)
         i += 1
     tree_is_complete = len(new_nodes) == 1
     if tree_is_complete:
