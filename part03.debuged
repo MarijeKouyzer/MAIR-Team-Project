@@ -21,6 +21,8 @@ class Node:
     children: list = []
     parent = None
     return_type = ""
+    # 0 or 1
+    return_rule = 1
 
     def add_child(self, child):
         self.children.append(child)
@@ -37,6 +39,7 @@ class Node:
             print("\\ split branch self.type: ", self.type)
             print("expected left type ",expected_left_type)
             self.return_type = remove_brackets(right__type_split[1])
+            self.return_rule = 0
             return True
 
         left__type_split = self.type.rsplit("/", 1)
@@ -48,6 +51,7 @@ class Node:
                 print("right.type == expected_right_type, expected_right_type[0]: ", expected_right_type[0])
                 # self.return_type = remove_brackets(expected_right_type[0]) <- This line might be logically wrong
                 self.return_type = remove_brackets(left__type_split[0])
+                self.return_rule = 1
                 print("self.retype: ", self.return_type)
                 return True
         print("False returned")
@@ -143,22 +147,31 @@ def evaluate_word_list(nodes: list) -> Node:
     while len(ori_nodes) != 1:
         i = 0
         structure_changed = False
-        while i < len(ori_nodes)-1:
-            if ori_nodes[i].is_compatible_with(ori_nodes[i + 1]):
-                print(i, " is compatible")
-                print(ori_nodes[i].text, " ", ori_nodes[i].return_type)
-                new_node = Node()
-                new_node.type = ori_nodes[i].return_type
-                new_node.text = ori_nodes[i].text + " " + ori_nodes[i+1].text
-                print("new node", new_node.type, " ", new_node.text)
-                new_node.children.append(ori_nodes[i])
-                new_node.children.append(ori_nodes[i+1])
-                ori_nodes[i].parent = new_node
-                ori_nodes[i+1].parent = new_node
-                new_nodes.append(new_node)
+        while i <= len(ori_nodes)-1:
+            if i < len(ori_nodes)-1:
+                if ori_nodes[i].is_compatible_with(ori_nodes[i + 1]):
+                    print(i, " is compatible")
+                    print(ori_nodes[i].text, " ", ori_nodes[i].return_type)
+                    new_node = Node()
+                    new_node.type = ori_nodes[i].return_type
+                    new_node.text = ori_nodes[i].text + " " + ori_nodes[i+1].text
+                    print("new node!", new_node.type, " text: ", new_node.text)
+                    new_node.children.append(ori_nodes[i])
+                    new_node.children.append(ori_nodes[i+1])
+                    ori_nodes[i].parent = new_node
+                    ori_nodes[i+1].parent = new_node
+                    new_nodes.append(new_node)
 
-                structure_changed = True
-                i = i+1
+                    structure_changed = True
+                    if ori_nodes[i].return_rule == 1:
+                        print("%%%%%%%%%%% slash 1 rule %%%%%%%%%%%%")
+                        i = i+1
+                    if ori_nodes[i].return_rule == 0:
+                        print("%%%%%%%%%%% slash 0 rule %%%%%%%%%%%%")
+                        i = i + 1
+                else:
+                    print(i, " is not compatible")
+                    new_nodes.append(ori_nodes[i])
             else:
                 print(i, " is not compatible")
                 new_nodes.append(ori_nodes[i])
@@ -185,19 +198,21 @@ def evaluate_word_list(nodes: list) -> Node:
             print("structure not changed")
             break
         # i = i + 1
-
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("Final nodes")
     for new in ori_nodes :
         print(new.text)
     print("Final length")
-    print(len(new_nodes))
-    tree_is_complete = len(new_nodes) == 1
+    print(len(ori_nodes))
+    tree_is_complete = len(ori_nodes) == 1
     if tree_is_complete:
         print("Tree is complete")
-        tree_node = new_nodes[0]
-    nothing_changed = True
-    if nothing_changed or tree_is_complete:
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        tree_node = ori_nodes[0]
+        return tree_node
+    if structure_changed is False or tree_is_complete is False:
         print("Nothing change or and tree is not complete")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return tree_node
     return Node()
 
@@ -255,32 +270,14 @@ while True:
     user_text = input("Enter text to evaluate: ")
     root_node = build_tree(user_text)
     variable_nodes = dict()
-
-    #traverse_tree(root_node)
-    #root_node.print()
-    # print("\n---------\n")
-    # print("VARIABLES\n")
-    # print("---------\n")
-    #  print("---------")
-    # for key, value in variable_nodes.items():
-    #     print("---------\n")
-    #      print(key + "\n")
-    #     value.print()
-
-
-# Wait for input
-while True:
-    user_text = input("Enter text to evaluate: ")
-    root_node = build_tree(user_text)
-    variable_nodes = dict()
-
-    #traverse_tree(root_node)
-    #root_node.print()
-    # print("\n---------\n")
-    # print("VARIABLES\n")
-    # print("---------\n")
-    #  print("---------")
-    # for key, value in variable_nodes.items():
-    #     print("---------\n")
-    #      print(key + "\n")
-    #     value.print()
+    print("The root node will be ", root_node.text)
+    traverse_tree(root_node)
+    root_node.print()
+    print("\n---------\n")
+    print("VARIABLES\n")
+    print("---------\n")
+    print("---------")
+    for key, value in variable_nodes.items():
+         print("---------\n")
+         print(key + "\n")
+         value.print()
