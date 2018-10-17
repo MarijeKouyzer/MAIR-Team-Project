@@ -175,18 +175,19 @@ def evaluate_word_list(nodes: list) -> Node:
             print(len(new_nodes))
             print("#################################")
             ori_nodes = new_nodes
-            print("ori node check")
-            for n in ori_nodes:
-                print(n.text)
-            print("ori  node length")
-            print(len(ori_nodes))
+            new_nodes = list()
+            # print("ori node check")
+            # for n in ori_nodes:
+            #     print(n.text)
+            # print("ori  node length")
+            # print(len(ori_nodes))
         if structure_changed is False:
             print("structure not changed")
             break
         # i = i + 1
 
     print("Final nodes")
-    for new in new_nodes :
+    for new in ori_nodes :
         print(new.text)
     print("Final length")
     print(len(new_nodes))
@@ -247,6 +248,24 @@ def traverse_tree(node):
         return
     for child in node.children:
         traverse_tree(child)
+
+
+# Wait for input
+while True:
+    user_text = input("Enter text to evaluate: ")
+    root_node = build_tree(user_text)
+    variable_nodes = dict()
+
+    #traverse_tree(root_node)
+    #root_node.print()
+    # print("\n---------\n")
+    # print("VARIABLES\n")
+    # print("---------\n")
+    #  print("---------")
+    # for key, value in variable_nodes.items():
+    #     print("---------\n")
+    #      print(key + "\n")
+    #     value.print()
 
 
 # Wait for input
