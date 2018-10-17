@@ -37,13 +37,14 @@ class Node:
         for left_type in self.types:
             for right_type in right.types:
                 right__type_split = right_type.rsplit("\\", 1)
-                expected_left_type = right__type_split[0]
-                if left_type == expected_left_type:
-                    self.type = left_type
-                    right.type = right_type
-                    self.return_type = remove_brackets(right__type_split[1])
-                    self.return_rule = 0
-                    return True
+                if len(right__type_split) == 2:
+                    expected_left_type = right__type_split[0]
+                    if left_type == expected_left_type:
+                        self.type = left_type
+                        right.type = right_type
+                        self.return_type = remove_brackets(right__type_split[1])
+                        self.return_rule = 0
+                        return True
 
                 left__type_split = left_type.rsplit("/", 1)
                 if len(left__type_split) == 2:
@@ -535,7 +536,7 @@ def traverse_tree(node):
 
 # Wait for input
 while True:
-    user_text = input("Enter text to evaluate: ")
+    user_text = input("Enter text to evaluate: ").lower()
     root_node = build_tree(user_text)
     variable_nodes = dict()
     print("The root node will be ", root_node.text)
