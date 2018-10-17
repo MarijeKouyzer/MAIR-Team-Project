@@ -1,10 +1,16 @@
 def remove_brackets(word):
     return_word = word
     print("in remove brackets ", return_word)
-    if word[0] == "(":
+    # print(return_word[0])
+    # print(return_word[(len(word)-1)])
+    if return_word[0] == "(":
+        # print("must remove ( from ", return_word)
         return_word = return_word[1::]
-    if word[-len(word)] == ")":
-        return_word = return_word[::-1]
+    if return_word[(len(return_word)-1)] == ")":
+        # print("must remove ) from ", return_word)
+        # return_word = return_word[::-1] <- I think this is logically incorrect
+        return_word = return_word[:-1]
+    print(return_word, " is returned")
     return return_word
 
 
@@ -20,26 +26,29 @@ class Node:
         self.children.append(child)
 
     def is_compatible_with(self, right):
-        print("self ", self.text)
+        print("*******************")
+        print("node.self: ", self.text)
+        print("right ",right.text )
+        print("*******************")
         right__type_split = right.type.rsplit("\\", 1)
         print("Right type s: ", right__type_split)
         expected_left_type = right__type_split[0]
         if self.type == expected_left_type:
+            print("\\ split branch self.type: ", self.type)
+            print("expected left type ",expected_left_type)
             self.return_type = remove_brackets(right__type_split[1])
-            print("\\ split branch self.retype ", self.return_type)
             return True
 
         left__type_split = self.type.rsplit("/", 1)
         print("Left type s: ", left__type_split)
         if len(left__type_split) == 2:
-
             expected_right_type = left__type_split[1]
             print("/ split branch, expected_right_type: ",expected_right_type)
             if right.type == expected_right_type:
                 print("right.type == expected_right_type, expected_right_type[0]: ", expected_right_type[0])
                 # self.return_type = remove_brackets(expected_right_type[0]) <- This line might be logically wrong
                 self.return_type = remove_brackets(left__type_split[0])
-                print("self.retype ", self.return_type)
+                print("self.retype: ", self.return_type)
                 return True
         print("False returned")
         return False
@@ -81,35 +90,105 @@ def evaluate_word_list(nodes: list) -> Node:
     tree_node = Node()
     new_nodes = list()
     ori_nodes = nodes
+
     # i want a restaurant serving swedish food
+    # i = 0
+    # for node in ori_nodes:
+    #     if i != len(nodes):
+    #         print("check i: %s", i)
+    #         if i + 1 < len(nodes):
+    #             if node.is_compatible_with(nodes[i+1]):
+    #                 print(i, " is compatible")
+    #                 print(node.text, " ", node.return_type)
+    #                 new_node = Node()
+    #                 new_node.type = node.return_type
+    #                 new_node.text = node.text + " " + nodes[i+1].text
+    #                 print("new node", new_node.type, " ", new_node.text)
+    #                 new_node.children.append(node)
+    #                 new_node.children.append(nodes[i+1])
+    #                 node.parent = new_node
+    #                 nodes[i+1].parent = new_node
+    #                 new_nodes.append(new_node)
+    #             else:
+    #                 new_nodes.append(node)
+    #     else:
+    #         new_nodes.append(node)
+    #     i += 1
+
+    # Pseudo algorithm here
+    # while len(nodes)!=1
+    #     i=0
+    #     structure_changed = False
+    #     while i<len(nodes)-1
+    #       do is_compatible from left to right in nodes in nodes[0:len(nodes)-1]
+    #       if node is compatible
+    #           structure_changed = True
+    #           put combined new type in new node list
+    #       else
+    #           put node in new node list
+    #       i++
+    #     if i== len(nodes - 1) && structure_changed == True
+    #       create new candidates by nodes = new_node_list
+    #     if i== len(nodes - 1) && structure_changed == False
+    #         break
+    #     i +=1
+
+    print("ASDASDSADDA")
+    print(len(ori_nodes))
+
+    global i
+    global structure_changed
     i = 0
+    structure_changed = False
+    while len(ori_nodes) != 1:
+        i = 0
+        structure_changed = False
+        while i < len(ori_nodes)-1:
+            if ori_nodes[i].is_compatible_with(ori_nodes[i + 1]):
+                print(i, " is compatible")
+                print(ori_nodes[i].text, " ", ori_nodes[i].return_type)
+                new_node = Node()
+                new_node.type = ori_nodes[i].return_type
+                new_node.text = ori_nodes[i].text + " " + ori_nodes[i+1].text
+                print("new node", new_node.type, " ", new_node.text)
+                new_node.children.append(ori_nodes[i])
+                new_node.children.append(ori_nodes[i+1])
+                ori_nodes[i].parent = new_node
+                ori_nodes[i+1].parent = new_node
+                new_nodes.append(new_node)
 
-    for node in ori_nodes:
-        if i != len(nodes):
-            print("check i: %s", i)
-            if i + 1 < len(nodes):
-                if node.is_compatible_with(nodes[i+1]):
-                    print(i, " is compatible")
-                    print(node.text, " ", node.return_type)
-                    new_node = Node()
-                    new_node.type = node.return_type
-                    new_node.text = node.text + " " + nodes[i+1].text
-                    print("new node", new_node.type, " ", new_node.text)
-                    new_node.children.append(node)
-                    new_node.children.append(nodes[i+1])
-                    node.parent = new_node
-                    nodes[i+1].parent = new_node
-                    new_nodes.append(new_node)
-                else:
-                    new_nodes.append(node)
-        else:
-            new_nodes.append(node)
-        i += 1
+                structure_changed = True
+                i = i+1
+            else:
+                print(i, " is not compatible")
+                new_nodes.append(ori_nodes[i])
+            i = i + 1
 
-    print("New nodes")
+        if structure_changed is True:
+            # create new candidates by nodes = new_node_list
+            print("structure changed")
+            print("#################################")
+            print("New nodes")
+            for new in new_nodes:
+                print(new.text)
+            print("new  node length")
+            print(len(new_nodes))
+            print("#################################")
+            ori_nodes = new_nodes
+            print("ori node check")
+            for n in ori_nodes:
+                print(n.text)
+            print("ori  node length")
+            print(len(ori_nodes))
+        if structure_changed is False:
+            print("structure not changed")
+            break
+        # i = i + 1
+
+    print("Final nodes")
     for new in new_nodes :
         print(new.text)
-    print("New node length")
+    print("Final length")
     print(len(new_nodes))
     tree_is_complete = len(new_nodes) == 1
     if tree_is_complete:
@@ -176,13 +255,13 @@ while True:
     root_node = build_tree(user_text)
     variable_nodes = dict()
 
-    traverse_tree(root_node)
+    #traverse_tree(root_node)
     #root_node.print()
-   # print("\n---------\n")
-   # print("VARIABLES\n")
-   # print("---------\n")
-  #  print("---------")
-   # for key, value in variable_nodes.items():
-   #     print("---------\n")
-  #      print(key + "\n")
-   #     value.print()
+    # print("\n---------\n")
+    # print("VARIABLES\n")
+    # print("---------\n")
+    #  print("---------")
+    # for key, value in variable_nodes.items():
+    #     print("---------\n")
+    #      print(key + "\n")
+    #     value.print()
