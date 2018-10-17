@@ -544,6 +544,9 @@ while True:
     print("--------")
     root_node.print()
     traverse_tree(root_node)
+    for var_type in variable_types.keys():
+        if var_type not in variable_nodes.keys():
+            find_variables_in_branch(root_node, var_type)
     print("\n---------")
     print("VARIABLES")
     print("---------")
