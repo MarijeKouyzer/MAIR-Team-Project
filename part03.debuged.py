@@ -502,17 +502,17 @@ def get_word_types(word):
     for word_key in rules.keys():
         levenshtein_distances[word_key] = sm(seq1=word, seq2=word_key).distance()
     min_valued_word = ""
-    min_valued_word_value = 999999999999999
-    for key, value in levenshtein_distances.items():
-        if value < min_valued_word_value:
-            min_valued_word = key
-            min_valued_word_value = value
+    min_valued_word_value = -1
+    for k_key, v_value in levenshtein_distances.items():
+        if v_value < min_valued_word_value or min_valued_word_value == -1:
+            min_valued_word = k_key
+            min_valued_word_value = v_value
     return rules[min_valued_word]
 
 
-def build_tree(text: str) -> Node:
+def build_tree(line: str) -> Node:
     # Change the text into a list of nodes containing the word and the type
-    word_list = text.split(" ")
+    word_list = line.split(" ")
     node_list = list()
     # print(word_list)
     for word in word_list:
@@ -554,14 +554,18 @@ def traverse_tree(node):
         traverse_tree(child)
 
 
-# Wait for input
-while True:
-    user_text = input("Enter text to evaluate: ")
+def normalise_line(line):
     # Make text lower case
     text = user_text.lower()
     # Remove characters from string to standardise the strings
     text = re.sub('[!"#$%&()*+,-./:;<=>?@[\]^_`{|}~]', '', text)
-    root_node = build_tree(text)
+    return text
+
+
+# Wait for input
+while True:
+    user_text = input("Enter text to evaluate: ")
+    root_node = build_tree(normalise_line(user_text))
     variable_nodes = dict()
     print("The root node will be ", root_node.text)
     print("TREE")
