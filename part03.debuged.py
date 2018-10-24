@@ -1,4 +1,5 @@
 import re
+from Levenshtein.StringMatcher import StringMatcher as sm
 
 
 def remove_brackets(word):
@@ -494,6 +495,21 @@ def evaluate_word_list(nodes: list) -> Node:
     return Node()
 
 
+def get_word_types(word):
+    if word in rules.keys():
+        return rules[word]
+    levenshtein_distances = {}
+    for word_key in rules.keys():
+        levenshtein_distances[word_key] = sm(seq1=word, seq2=word_key).distance()
+    min_valued_word = ""
+    min_valued_word_value = 999999999999999
+    for key, value in levenshtein_distances.items():
+        if value < min_valued_word_value:
+            min_valued_word = key
+            min_valued_word_value = value
+    return rules[min_valued_word]
+
+
 def build_tree(text: str) -> Node:
     # Change the text into a list of nodes containing the word and the type
     word_list = text.split(" ")
@@ -502,10 +518,7 @@ def build_tree(text: str) -> Node:
     for word in word_list:
         word_node = Node()
         word_node.text = word
-        if word in rules.keys():
-            word_node.types = rules[word]
-        else:
-            word_node.types = ["np"]
+        word_node.types = get_word_types(word)
         node_list.append(word_node)
     # Return the tree
     # print(node_list[1].text)
