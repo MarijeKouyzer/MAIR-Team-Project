@@ -1,3 +1,6 @@
+import re
+
+
 def remove_brackets(word):
     return_word = word
     print("in remove brackets ", return_word)
@@ -15,7 +18,6 @@ def remove_brackets(word):
 
 
 class Node:
-    variable_type: str = ""
     text: str = ""
     type: str = ""
     types: list = []
@@ -31,15 +33,18 @@ class Node:
 
     def is_compatible_with(self, right):
         print("*******************")
-        print("left ", self.text)
-        print("right ", right.text)
+        print("left  text:", self.text)
+        print("      types:", self.types)
+        print("right text", right.text)
+        print("      types:", right.types)
         print("*******************")
         for left_type in self.types:
             for right_type in right.types:
                 right__type_split = right_type.rsplit("\\", 1)
                 if len(right__type_split) == 2:
                     expected_left_type = right__type_split[0]
-                    if left_type == expected_left_type:
+                    print("expected: " + expected_left_type + ", actual: " + left_type)
+                    if left_type == remove_brackets(expected_left_type):
                         self.type = left_type
                         right.type = right_type
                         self.return_type = remove_brackets(right__type_split[1])
@@ -49,7 +54,8 @@ class Node:
                 left__type_split = left_type.rsplit("/", 1)
                 if len(left__type_split) == 2:
                     expected_right_type = left__type_split[1]
-                    if right_type == expected_right_type:
+                    print("expected: " + expected_right_type + ", actual: " + right_type)
+                    if right_type == remove_brackets(expected_right_type):
                         self.type = left_type
                         right.type = right_type
                         self.return_type = remove_brackets(left__type_split[0])
@@ -76,55 +82,55 @@ class Node:
 
 rules = {
     "i": ["np"],
-    "want": ["(np\s)/np", "(np\s)/np"],
-    "a": ["np/np"],
-    "restaurant": ["np"],
-    "serving": ["(s\s)/np", "(s\s)/np"],
-    "swedish": ["np/np", "np/np"],
-    "food": ["np"],
+    "want": ["np\s/np"],
+    "a": ["np/n"],
+    "restaurant": ["n"],
+    "serving": ["s\s/n"],
+    "swedish": ["n/n"],
+    "food": ["n"],
     "about": ["np\(s/np)", "pp/np"],
-    "an": ["np/np"],
+    "an": ["(np\s)/n"],
     "and": ["(s\s)/s", "(np\\np)/np"],
     "any": ["np/np"],
     "area": ["np"],
-    "can": ["s/(np\s)"],
+    "can": ["np/np"],
     "catalan": ["np/np"],
-    "center": ["np"],
-    "cheap": ["np/np"],
+    "center": ["n"],
+    "cheap": ["n/n"],
     "chinese": ["np/np"],
     "cuban": ["np/np"],
-    "expensive": ["np/np"],
+    "expensive": ["n/n"],
     "find": ["(np\s)/np", "((np\s)/pp)/np"],
     "for": ["pp/np"],
-    "have": ["(np\s)/np", "(np\s)/(np\s)"],
-    "im": ["s"],
+    "have": ["np\s/(np\s)"],
+    "im": ["np"],
     "in": ["pp/np"],
     "international": ["np/np"],
     "is": ["vp/adjP", "np\((s/pp)/np)"],
     "it": ["np"],
     "serve": ["(np\s)/np"],
-    "serves": ["vp/np"],
+    "serves": ["s/n"],
     "should": ["(np\s)/(np\s)"],
-    "like": ["(np\s)/np"],
-    "looking": ["s\(s/pp)", "s\((s/pp)/pp)"],
-    "moderately": ["adv"],
+    "like": ["(np\s)/pp/np"],
+    "looking": ["np\s/pp/pp", "np\s/pp"],
+    "moderately": ["n/n"],
     "need": ["(np\s)/np", "np"],
-    "of": ["np\(np/np)"],
-    "part": ["np"],
+    "of": ["pp/np"],
+    "part": ["n/pp"],
     "persian": ["np/np"],
     "please": ["s\s"],
-    "priced": ["adv\(np/np)", "adv\\adjP"],
+    "priced": ["s\s/pp/n"],
     "south": ["np/np"],
-    "that": ["(s\s)/vp"],
-    "the": ["np/np"],
+    "that": ["s\s/s"],
+    "the": ["np/n"],
     "town": ["np"],
     "tuscan": ["np/np"],
     "wanna": ["(np\s)/(np\s)"],
-    "west": ["np/np"],
+    "west": ["n/n"],
     "what": ["np"],
     "with": ["pp/np"],
-    "world": ["np/np"],
-    "would": ["np\((s/pp)/np\s))"],
+    "world": ["n/n"],
+    "would": ["np\s/(np\s)"],
     "address": ["np"],
     "afghan": ["np/np"],
     "african": ["np/np"],
@@ -139,7 +145,7 @@ rules = {
     "fast": ["np/np"],
     "fine": ["s/s"],
     "fish": ["np/np"],
-    "foods": ["np"],
+    "foods": ["n"],
     "canapes": ["np/np"],
     "cantonese": ["np/np"],
     "care": ["np\s"],
@@ -180,7 +186,7 @@ rules = {
     "no": ["np/np"],
     "north": ["np/np"],
     "not": ["np/np", "np"],
-    "parts": ["np"],
+    "parts": ["n/pp"],
     "place": ["np"],
     "polish": ["np/np"],
     "polynesia": ["np/np"],
@@ -322,7 +328,7 @@ rules = {
     "other": ["np/np"],
     "pan": ["np"],
     "park": ["np"],
-    "restaurants": ["np"],
+    "restaurants": ["n"],
     "rice": ["np"],
     "romania": ["np/np"],
     "romanian": ["np/np"],
@@ -351,8 +357,8 @@ rules = {
 }
 variable_types = {
     "area": {
-        "keywords": ["town", "of"],
-        "words": ["east", "west", "north", "south", "centre"]
+        "keywords": ["town", "of", "in"],
+        "words": ["east", "west", "north", "south", "center", "centre"]
     },
     "price_range": {
         "keywords": ["restaurant", "price"],
@@ -399,7 +405,8 @@ variable_types = {
                   "lebanese",
                   "cubun",
                   "japenese",
-                  "catalan"]
+                  "catalan",
+                  "world"]
     }
 }
 variable_nodes = dict()
@@ -536,8 +543,12 @@ def traverse_tree(node):
 
 # Wait for input
 while True:
-    user_text = input("Enter text to evaluate: ").lower()
-    root_node = build_tree(user_text)
+    user_text = input("Enter text to evaluate: ")
+    # Make text lower case
+    text = user_text.lower()
+    # Remove characters from string to standardise the strings
+    text = re.sub('[!"#$%&()*+,-./:;<=>?@[\]^_`{|}~]', '', text)
+    root_node = build_tree(text)
     variable_nodes = dict()
     print("The root node will be ", root_node.text)
     print("TREE")
