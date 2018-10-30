@@ -1,4 +1,4 @@
-import re
+import re, copy
 from Levenshtein.StringMatcher import StringMatcher as sm
 
 
@@ -414,85 +414,67 @@ variable_nodes = dict()
 
 
 def evaluate_word_list(nodes: list) -> Node:
-    tree_node = Node()
     new_nodes = list()
-    ori_nodes = nodes
+    new_nodes.append([[], []])
 
-    print(len(ori_nodes))
+    def node_can_be_appended(n: list, n_node: Node):
+        return n_node not in n[1]
 
-    global i
-    global structure_changed
-    i = 0
-    structure_changed = False
-    while len(ori_nodes) != 1:
-        i = 0
-        structure_changed = False
-        while i <= len(ori_nodes)-1:
-            if i < len(ori_nodes)-1:
-                if ori_nodes[i].is_compatible_with(ori_nodes[i + 1]):
-                    print(i, " is compatible")
-                    print(ori_nodes[i].text, " ", ori_nodes[i].return_type)
-                    new_node = Node()
-                    new_node.children = []
-                    new_node.types = [ori_nodes[i].return_type]
-                    new_node.type = ori_nodes[i].return_type
-                    new_node.text = ori_nodes[i].text + " " + ori_nodes[i+1].text
-                    print("new node!", new_node.type, " text: ", new_node.text)
-                    new_node.children.append(ori_nodes[i])
-                    new_node.children.append(ori_nodes[i+1])
-                    ori_nodes[i].parent = new_node
-                    ori_nodes[i+1].parent = new_node
-                    new_node.print()
-                    new_nodes.append(new_node)
+    def append_unchanged_node(n: Node):
+        j = 0
+        for n_nodes in new_nodes:
+            if node_can_be_appended(n_nodes, n):
+                new_nodes[j][0].append(n)
+            j += 1
 
-                    structure_changed = True
-                    if ori_nodes[i].return_rule == 1:
-                        print("%%%%%%%%%%% slash 1 rule %%%%%%%%%%%%")
-                        i = i+1
-                    if ori_nodes[i].return_rule == 0:
-                        print("%%%%%%%%%%% slash 0 rule %%%%%%%%%%%%")
-                        i = i + 1
-                else:
-                    print(i, " is not compatible")
-                    new_nodes.append(ori_nodes[i])
+    def create_new_node(left_node, right_node) -> Node:
+        n_node = Node()
+        n_node.children = []
+        n_node.types = [left_node.return_type]
+        n_node.type = left_node.return_type
+        n_node.text = left_node.text + " " + right_node.text
+        n_node.children.append(left_node)
+        n_node.children.append(right_node)
+        left_node.parent = n_node
+        right_node.parent = n_node
+        return n_node
+
+    def create_new_nodes_lists(n_node: Node, left_node, right_node):
+        length = len(new_nodes)
+        for j in range(0, length):
+            if node_can_be_appended(new_nodes[j], n_node):
+                n_nodes_with_change = copy.copy(new_nodes[j])
+                n_nodes_with_change[0].append(n_node)
+                n_nodes_with_change[1].append(left_node)
+                n_nodes_with_change[1].append(right_node)
+                new_nodes.append(n_nodes_with_change)
+                new_nodes[j][0].append(left_node)
+
+    def remove_original_list_from_new_nodes():
+        new_nodes.pop(0)
+
+    def attempt_all_trees() -> Node:
+        for n_nodes in new_nodes:
+            next_recursive_iteration_result = evaluate_word_list(n_nodes[0])
+            if next_recursive_iteration_result.text != "":
+                return next_recursive_iteration_result
+        return Node()
+
+    leng = len(nodes)
+    for i in range(0, leng):
+        print(i)
+        node = nodes[i]
+        if i < len(nodes)-1:
+            r_node = nodes[i+1]
+            if node.is_compatible_with(r_node):
+                new_node = create_new_node(node, r_node)
+                create_new_nodes_lists(new_node, node, r_node)
             else:
-                print(i, " is not compatible")
-                new_nodes.append(ori_nodes[i])
-            i = i + 1
-
-        if structure_changed is True:
-            # create new candidates by nodes = new_node_list
-            print("structure changed")
-            print("#################################")
-            print("New nodes")
-            for new in new_nodes:
-                print(new.text)
-            print("new  node length")
-            print(len(new_nodes))
-            print("#################################")
-            ori_nodes = new_nodes
-            new_nodes = list()
-        if structure_changed is False:
-            print("structure not changed")
-            break
-        # i = i + 1
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print("Final nodes")
-    for new in ori_nodes:
-        print(new.text)
-    print("Final length")
-    print(len(ori_nodes))
-    tree_is_complete = len(ori_nodes) == 1
-    if tree_is_complete:
-        print("Tree is complete")
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        tree_node = ori_nodes[0]
-        return tree_node
-    if structure_changed is False or tree_is_complete is False:
-        print("Nothing change or and tree is not complete")
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        return tree_node
-    return Node()
+                append_unchanged_node(node)
+        else:
+            append_unchanged_node(node)
+    remove_original_list_from_new_nodes()
+    return attempt_all_trees()
 
 
 def get_word_types(word):
@@ -521,7 +503,6 @@ def build_tree(line: str) -> Node:
         word_node.types = get_word_types(word)
         node_list.append(word_node)
     # Return the tree
-    # print(node_list[1].text)
     return evaluate_word_list(node_list)
 
 
