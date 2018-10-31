@@ -76,8 +76,8 @@ loss, acc = text_classifier.evaluate(
     word_to_integer_converter.convert_list(test_utterances_list),
     speech_act_to_vector_converter.convert_list(test_speech_act_list)
 )
-print("Test loss: " + loss)
-print("Test accuracy: " + acc)
+print("Test loss: " + '{:.2f}'.format(loss))
+print("Test accuracy: " + '{:.2f}'.format(acc))
 
 # Wait for input
 while True:
