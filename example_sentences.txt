@@ -1,0 +1,69 @@
+Example 1
+system: Hi, what kind of restaurant are you looking for?
+user: i want a restaurant that serves italian food 
+system: What price range?
+user: moderate price and in west part of town
+system: The prezzo is a restaurant and serves italian food in the moderate price range in the west part of town.
+Does that sound good?
+user: yes
+system: Would you like any information?
+user: The prezzo address is 21 - 24 northampton road, c.b 3 and it has telephone number 01799 521260
+system: no
+user: Bye!
+
+
+Example 2
+system: Hi, what kind of restaurant are you looking for?
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+
+Example 3
+system: Hi, what kind of restaurant are you looking for?
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+
+Example 4
+system: Hi, what kind of restaurant are you looking for?
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+
+Example 5
+system: Hi, what kind of restaurant are you looking for?
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:
+system:
+user:

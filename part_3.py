@@ -119,7 +119,7 @@ rules = {
     "that": ["s\s/s", "s\s/n"],
     "the": ["np/n"],
     "town": ["np"],
-    "tuscan": ["np/np", "n/n"],
+    "tuscan": ["n/n"],
     "wanna": ["np\s/np"],
     "west": ["n/n"],
     "what": ["n"],
@@ -563,6 +563,7 @@ def search_for_variable_without_tree(nodes: list):
 
 
 # Wait for input
+
 while True:
     user_text = input("Enter text to evaluate: ")
     nodes_list = build_node_list(normalise_line(user_text))
@@ -582,3 +583,5 @@ while True:
         print("TYPE: " + key)
         print("PATH:")
         value.variable_print()
+        print(key)
+        print(value.text)
