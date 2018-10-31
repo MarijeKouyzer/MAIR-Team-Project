@@ -400,7 +400,7 @@ variable_types = {
                   "persian",
                   "jamaican",
                   "lebanese",
-                  "cubun",
+                  "cuban",
                   "japenese",
                   "catalan",
                   "world"]
@@ -409,7 +409,7 @@ variable_types = {
 variable_nodes = dict()
 
 
-def evaluate_word_list(nodes: list) -> Node:
+def build_tree(nodes: list) -> Node:
     new_nodes = list()
     new_nodes.append([[], []])
 
@@ -455,7 +455,7 @@ def evaluate_word_list(nodes: list) -> Node:
         if attempted_root_node.text != "":
             return attempted_root_node
         for n_nodes in new_nodes:
-            next_recursive_iteration_result = evaluate_word_list(n_nodes[0])
+            next_recursive_iteration_result = build_tree(n_nodes[0])
             if next_recursive_iteration_result.text != "":
                 return next_recursive_iteration_result
         return Node()
@@ -483,9 +483,9 @@ def evaluate_word_list(nodes: list) -> Node:
     return attempt_all_trees()
 
 
-def get_word_types(word):
+def get_word(word):
     if word in rules.keys():
-        return rules[word]
+        return word, rules[word]
     levenshtein_distances = {}
     for word_key in rules.keys():
         levenshtein_distances[word_key] = sm(seq1=word, seq2=word_key).distance()
@@ -495,21 +495,21 @@ def get_word_types(word):
         if v_value < min_valued_word_value or min_valued_word_value == -1:
             min_valued_word = k_key
             min_valued_word_value = v_value
-    return rules[min_valued_word]
+    return min_valued_word, rules[min_valued_word]
 
 
-def build_tree(line: str) -> Node:
+def build_node_list(line: str) -> list:
     # Change the text into a list of nodes containing the word and the type
     word_list = line.split(" ")
     node_list = list()
-    # print(word_list)
     for word in word_list:
         word_node = Node()
+        word, types = get_word(word)
         word_node.text = word
-        word_node.types = get_word_types(word)
+        word_node.types = types
         node_list.append(word_node)
-    # Return the tree
-    return evaluate_word_list(node_list)
+    # Return the nodes
+    return node_list
 
 
 def find_variables_in_branch(node, variable_type: str):
@@ -549,19 +549,32 @@ def normalise_line(line):
     return text
 
 
+def search_for_variables_in_tree(tree):
+    for var_type in variable_types.keys():
+        if var_type not in variable_nodes.keys():
+            find_variables_in_branch(tree, var_type)
+
+
+def search_for_variable_without_tree(nodes: list):
+    for node in nodes:
+        for var_type in variable_types.keys():
+            if var_type not in variable_nodes.keys():
+                find_variables_in_branch(node, var_type)
+
+
 # Wait for input
 while True:
     user_text = input("Enter text to evaluate: ")
-    root_node = build_tree(normalise_line(user_text))
+    nodes_list = build_node_list(normalise_line(user_text))
+    root_node = build_tree(nodes_list)
     variable_nodes = dict()
     print("The root node will be ", root_node.text)
     print("TREE")
     print("--------")
     root_node.print()
     traverse_tree(root_node)
-    for var_type in variable_types.keys():
-        if var_type not in variable_nodes.keys():
-            find_variables_in_branch(root_node, var_type)
+    search_for_variables_in_tree(root_node)
+    search_for_variable_without_tree(nodes_list)
     print("\n---------")
     print("VARIABLES")
     print("---------")
