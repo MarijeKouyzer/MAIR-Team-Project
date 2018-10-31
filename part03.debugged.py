@@ -124,7 +124,7 @@ rules = {
     "that": ["s\s/s", "s\s/n"],
     "the": ["np/n"],
     "town": ["np"],
-    "tuscan": ["np/np"],
+    "tuscan": ["n/n"],
     "wanna": ["np\s/np"],
     "west": ["n/n"],
     "what": ["n"],
