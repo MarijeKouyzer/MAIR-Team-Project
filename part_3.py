@@ -113,7 +113,7 @@ rules = {
     "of": ["pp/np"],
     "part": ["n/pp"],
     "persian": ["n/n"],
-    "please": ["s\s"],
+    "please": ["s\s", "pp"],
     "priced": ["n/pp", "n"],
     "south": ["n/n"],
     "that": ["s\s/s", "s\s/n"],
