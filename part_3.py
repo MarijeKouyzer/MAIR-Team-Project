@@ -5,9 +5,8 @@ from Levenshtein.StringMatcher import StringMatcher as sm
 def remove_brackets(word):
     return_word = word
     print("in remove brackets ", return_word)
-    if return_word[0] != "(":
-        return word
-    return_word = return_word[1::]
+    if return_word[0] == "(":
+        return_word = return_word[1::]
     if return_word[(len(return_word) - 1)] == ")":
         return_word = return_word[:-1]
     print(return_word, " is returned")
@@ -28,32 +27,6 @@ class Node:
     def add_child(self, child):
         self.children.append(child)
 
-    @staticmethod
-    def get_return_and_expected_type(type: str, split_char: str, reverse: bool):
-        escaped_type = type
-        # Find all () types
-        all_found = re.findall("\(.*\)", type)
-        index = 0
-        # Escape all found items
-        for found in all_found:
-            escaped_type = escaped_type.replace(found, "#" + str(index))
-            index += 1
-        # Get the expected and return type from the escaped string
-        if reverse:
-            escaped_split_type = escaped_type.rsplit(split_char, 1)
-        else:
-            escaped_split_type = escaped_type.split(split_char, 1)
-        # If nothing was found return the result as is
-        if len(escaped_split_type) != 2:
-            return escaped_split_type
-        # Replace the escaped characters again
-        index = 0
-        for found in all_found:
-            escaped_split_type[0] = escaped_split_type[0].replace("#" + str(index), found)
-            escaped_split_type[1] = escaped_split_type[1].replace("#" + str(index), found)
-            index += 1
-        return escaped_split_type
-
     def is_compatible_with(self, right):
         print("*******************")
         print("left  text:", self.text)
@@ -63,7 +36,7 @@ class Node:
         print("*******************")
         for left_type in self.types:
             for right_type in right.types:
-                right__type_split = self.get_return_and_expected_type(right_type, "\\", False)
+                right__type_split = right_type.rsplit("\\", 1)
                 if len(right__type_split) == 2:
                     expected_left_type = right__type_split[0]
                     print("expected: " + expected_left_type + ", actual: " + left_type)
@@ -74,7 +47,7 @@ class Node:
                         self.return_rule = 0
                         return True
 
-                left__type_split = self.get_return_and_expected_type(left_type, "/", True)
+                left__type_split = left_type.rsplit("/", 1)
                 if len(left__type_split) == 2:
                     expected_right_type = left__type_split[1]
                     print("expected: " + expected_right_type + ", actual: " + right_type)
