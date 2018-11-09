@@ -11,15 +11,13 @@ class TextClassifier:
         self.main_input = Input(shape=(sequence_length,),
                                 dtype='int32',
                                 name='main_input')
-        x = Embedding(output_dim=516,
+        x = Embedding(output_dim=258,
                       input_dim=vocabulary_size,
                       input_length=sequence_length,
                       mask_zero=True)(self.main_input)
         x = LSTM(32)(x)
-        x = Dense(64, activation='relu')(x)
-        x = Dense(64, activation='relu')(x)
-        x = Dense(64, activation='relu')(x)
-        x = Dense(64, activation='relu')(x)
+        x = Dense(128, activation='relu')(x)
+        x = Dense(128, activation='relu')(x)
         self.main_output = Dense(16,
                                  activation='softmax',
                                  name='main_output')(x)

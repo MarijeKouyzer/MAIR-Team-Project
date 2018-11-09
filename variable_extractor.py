@@ -3,11 +3,11 @@ class VariableExtractor:
     variable_types = {
         "area": {
             "keywords": ["town", "of", "in"],
-            "words": ["east", "west", "north", "south", "center", "centre"]
+            "words": ["east", "west", "north", "south", "center", "centre", "any"]
         },
         "price_range": {
             "keywords": ["restaurant", "price"],
-            "words": ["moderate", "expensive", "cheap"]
+            "words": ["moderate", "expensive", "cheap", "moderately"]
         },
         "food": {
             "keywords": ["restaurant", "serves", "serving", "food"],
@@ -35,7 +35,7 @@ class VariableExtractor:
                       "swiss",
                       "fusion",
                       "gastropub",
-                      "tuscun",
+                      "tuscan",
                       "international",
                       "traditional",
                       "mediterranean",
@@ -55,6 +55,9 @@ class VariableExtractor:
         }
     }
     variable_nodes = dict()
+
+    def __init__(self):
+        self.variable_nodes = dict()
 
     def find_variables_in_branch(self, node, variable_type: str):
         if node.text in self.variable_types[variable_type]["words"]:
