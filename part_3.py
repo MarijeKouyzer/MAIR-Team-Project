@@ -96,7 +96,8 @@ rules = {
     "cuban": ["n/n"],
     "expensive": ["n/n"],
     "find": ["np/np", "np\s/np", "np\s/pp/np"],
-    "for": ["pp/np", "pp/n"],
+    #"for": ["pp/np", "pp/n"], <- origin rule
+    "for": ["pp/np", "pp/n", "(s/pp/pp)\((np)/(np\np))/(np\s)"],
     "have": ["np\s/np\s"],
     "im": ["np"],
     "in": ["pp/np", "n\pp/np"],
