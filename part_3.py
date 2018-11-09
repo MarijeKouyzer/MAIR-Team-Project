@@ -81,7 +81,8 @@ rules = {
     "i": ["np"],
     "want": ["np\s/np"],
     "a": ["np/n"],
-    "restaurant": ["n"],
+    #"restaurant": ["n"],<- original
+    "restaurant": ["n", "(s/pp\(s))/(n\\s\\s)"],
     "serving": ["s\s/n"],
     "swedish": ["n/n"],
     "about": ["n\s/n"],
@@ -97,7 +98,8 @@ rules = {
     "cuban": ["n/n"],
     "expensive": ["n/n"],
     "find": ["np/np", "np\s/np", "np\s/pp/np"],
-    "for": ["pp/np", "pp/n"],
+    #"for": ["pp/np", "pp/n"], <- origin rule
+    "for": ["pp/np", "pp/n", "(s/pp/pp)\((np)/(np\np))/(np\s)"],
     "have": ["np\s/np\s"],
     "im": ["np"],
     "in": ["pp/np", "n\pp/np"],
