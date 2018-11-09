@@ -49,7 +49,7 @@ class SentenceToNodeConverter:
         "the": ["np/n"],
         "town": ["np"],
         "tuscan": ["n/n"],
-        "wanna": ["np\s/np"],
+        "wanna": ["np\s/s", "np\s/np"],
         "west": ["n/n"],
         "what": ["n"],
         "with": ["n\s\s/n"],
