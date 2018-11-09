@@ -80,7 +80,8 @@ rules = {
     "i": ["np"],
     "want": ["np\s/np"],
     "a": ["np/n"],
-    "restaurant": ["n"],
+    #"restaurant": ["n"],<- original
+    "restaurant": ["n", "(s/pp\(s))/(n\\s\\s)"],
     "serving": ["s\s/n"],
     "swedish": ["n/n"],
     "about": ["n\s/n"],
