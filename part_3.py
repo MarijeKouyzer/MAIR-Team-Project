@@ -1,3 +1,4 @@
+import copy
 import re
 from Levenshtein.StringMatcher import StringMatcher as sm
 
@@ -413,14 +414,19 @@ def build_tree(nodes: list) -> Node:
     new_nodes = list()
     new_nodes.append([[], []])
 
-    def node_can_be_appended(n: list, n_node: Node):
-        return n_node not in n[1]
+    def node_can_be_appended(n: list, n_nodes: list):
+        for used_node in n[1]:
+            for node_to_be_appended in n_nodes:
+                if used_node.text == node_to_be_appended.text:
+                    return False
+        return True
 
     def append_unchanged_node(n: Node):
         j = 0
         for n_nodes in new_nodes:
-            if node_can_be_appended(n_nodes, n):
+            if node_can_be_appended(n_nodes, [n]):
                 new_nodes[j][0].append(n)
+                new_nodes[j][1].append(n)
             j += 1
 
     def create_new_node(left_node, right_node) -> Node:
@@ -438,8 +444,8 @@ def build_tree(nodes: list) -> Node:
     def create_new_nodes_lists(n_node: Node, left_node, right_node):
         length = len(new_nodes)
         for j in range(0, length):
-            if node_can_be_appended(new_nodes[j], n_node):
-                n_nodes_with_change = [new_nodes[j][0].copy(), new_nodes[j][1].copy()]
+            if node_can_be_appended(new_nodes[j], [left_node, right_node]):
+                n_nodes_with_change = copy.deepcopy(new_nodes[j])
                 n_nodes_with_change[0].append(n_node)
                 n_nodes_with_change[1].append(left_node)
                 n_nodes_with_change[1].append(right_node)
