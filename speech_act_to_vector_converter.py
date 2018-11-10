@@ -31,9 +31,9 @@ class SpeechActToVectorConverter:
         return ""
 
     def convert_list(self, speech_acts: list):
-        print("Converting speech act list")
+        #print("Converting speech act list")
         result = list()
         for speech_act in speech_acts:
             result.append(array([self.convert_from_speech_act(speech_act)]))
-        print("Done converting speech act list")
+        #print("Done converting speech act list")
         return array(result)

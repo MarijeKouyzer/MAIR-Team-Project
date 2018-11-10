@@ -7,28 +7,28 @@ class WordToIntegerConverter:
     word_to_int_dict = dict()
 
     def __init__(self, training_vocabulary: list, vocabulary_size: int=None, sequence_length=100):
-        print("Initialising word to int dict")
+        #print("Initialising word to int dict")
         self.sequence_length = sequence_length
         self._setup(training_vocabulary, vocabulary_size)
-        print("Done initialising word to int dict")
+        #print("Done initialising word to int dict")
 
     def _setup(self, training_vocabulary: list, vocabulary_size: int=None):
         # Count words in the text
         words_with_counter = dict()
-        print("Normalising text")
+        #print("Normalising text")
         text_as_list_stem = self.normalise_text(self.list_to_str(training_vocabulary))
-        print("Counting words")
+        #print("Counting words")
         for word in text_as_list_stem:
             if word not in words_with_counter:
                 words_with_counter[word] = 1
             else:
                 words_with_counter[word] += 1
         # Organise the dict based on the counter in descending order
-        print("Sorting dict")
+        #print("Sorting dict")
         sorted_dict = sorted(words_with_counter.items(), key=lambda kv: kv[1])
         sorted_dict.reverse()
         # Add words to word_to_int_dict based in the occurrence count for the words
-        print("Creating conversion dict")
+        #print("Creating conversion dict")
         i = 2
         for word, count in sorted_dict:
             self.word_to_int_dict[word] = i
@@ -80,11 +80,11 @@ class WordToIntegerConverter:
         return array(text_as_integers)
 
     def convert_list(self, text_list: list):
-        print("Converting word list")
+        #print("Converting word list")
         new_list = list()
         for line in text_list:
             converted_line = self.convert_line(line)
             if len(converted_line) > 0:
                 new_list.append(converted_line)
-        print("Done converting word list")
+        #print("Done converting word list")
         return array(new_list)

@@ -16,7 +16,7 @@ from string import Template
 from sentence_to_node_converter import SentenceToNodeConverter
 from sentence_tree_builder import SentenceTreeBuilder
 from variable_extractor import VariableExtractor
-
+import json
 
 suggestions = []
 found = False
@@ -179,15 +179,15 @@ def generateQuestions():
         setQuestion(greeting,what)
         greeting = ''
     if 'pricerange'  not in variables and not found:
-        greeting = 'What price range? \n'
+        greeting = 'What price range are would you prefer? \n'
         what = 'pricerange'
         setQuestion(greeting,what)
     if 'area' not in variables and not found:
-        greeting = 'What area? \n'
+        greeting = 'In which part of town? \n'
         what = 'area'
         setQuestion(greeting,what)
     if 'food' not in variables and not found:
-        greeting = 'What food? \n'
+        greeting = 'What food would you like? \n'
         what = 'food'
         setQuestion(greeting,what)
 
@@ -236,40 +236,37 @@ def templates(suggestions, variables, values):
         i = i +1
 
     if length == 0:
-        src = Template('$restaurant $first.')
+        src = Template('$restaurant $first. Does this sound good?')
         dictionary['first'] = new[0]
     elif length == 1:
-        src = Template('$restaurant $first and it is $second.')
+        src = Template('$restaurant $first and it is $second. Does this sound good?')
         dictionary['first'] = new[0]
         dictionary['second'] = new[1]
     elif length == 2:
-        src = Template('$restaurant $first and it is $second $third.')
+        src = Template('$restaurant $first and it is $second $third. Does this sound good?')
         dictionary['first'] = new[0]
         dictionary['second'] = new[1]
         dictionary['third'] = new[2]
     
     dictionary['restaurant'] = restaurant_templates
 
-    #print(src.substitute(dictionary))
+    print(src.substitute(dictionary))
 
 def findVariablesAndTypes(user_text, variables, values, type):
-
-    root_node = None
-    nodes_list = None
     
     nodes_list = SentenceToNodeConverter().build_node_list(user_text)
     root_node = SentenceTreeBuilder().build_tree(nodes_list)
-    variable_nodes = dict()
+    #variable_nodes = dict()
 
-    root_node.print()
+    #root_node.print()
     variable_extractor = VariableExtractor()
     variable_extractor.traverse_tree(root_node)
     variable_extractor.search_for_variables_in_tree(root_node)
     variable_extractor.search_for_variable_without_tree(nodes_list)
-    
-    for key, value in variable_extractor.variable_nodes.items():
-        value.variable_print()
+
+
     return checkValidity(user_text, variables, values, type, variable_extractor.variable_nodes)
+
 
 
 def checkValidity(user_text, variables, values, type, variable_nodes):
@@ -287,6 +284,7 @@ def checkValidity(user_text, variables, values, type, variable_nodes):
             if(key == type or 'any' == type):
                 variables.append(key)
                 values.append(value.text)
+
             elif not (type != key and value.text == 'any'):
                 if key in variables:
                     index = variables.index(key)
@@ -325,7 +323,7 @@ def makeSuggestions():
     length = len(suggestions) - 1
     while speech_act == 'negate' and i <= length:
         templates(suggestions[i], variables, values)
-        user_text = input('Does that sound good?\n')
+        user_text = input()
         user_text = user_text.lower()
         speech_act = classifier(user_text)
         temp = suggestions[i]
@@ -337,16 +335,23 @@ def makeSuggestions():
     suggestions = temp
 
 def giveInformation():
-    #global loop
-    message = 'Would you like any more information? \n'
-    user_text = input(message)
-    user_text = user_text.lower()
-    speech_act = classifier(user_text)
-    if(speech_act == 'request' or speech_act == 'reqalts'):
-        print('The ' + suggestions['restaurantname'] + ' address is ' + suggestions["addr"] + ', ' + suggestions["postcode"] + ' and it has telephone number ' + suggestions['phone'])
-    print('Bye!')
+    global loop
+    flag = True
+    while(flag):
+        message = 'Would you like any more information? \n'
+        user_text = input(message)
+        user_text = user_text.lower()
+        speech_act = classifier(user_text)
+        if(speech_act == 'thankyou' or speech_act == 'negate'): #speech_act == 'request' or speech_act == 'reqalts'):
+            flag = False
+        else:
+             print('The ' + suggestions['restaurantname'] + ' address is ' + suggestions["addr"] + ', ' + suggestions["postcode"] + ' and it has telephone number ' + suggestions['phone'])
+    print('Goodbye!')
     setPreferencesToZero()
     loop = 0
+    print('============================================================')
+    print('New session started')
+    print('============================================================')
     main()
 
 def main():

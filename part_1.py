@@ -26,11 +26,11 @@ if not os.path.isdir(out_cwd):
 
 
 def parse_json_files():
-    print("Processing json files")
+    #print("Processing json files")
     iterate_over_folders(read_json_files)
-    print("Writing dialogue file")
+    #print("Writing dialogue file")
     write_dialogue_list_to_file()
-    print("Dialogues file created\n")
+    #print("Dialogues file created\n")
 
 
 def write_to_dialogue_list(dialogue: str):

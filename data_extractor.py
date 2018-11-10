@@ -28,7 +28,7 @@ class DataExtractor:
         with open(os.path.join(out_cwd, "utterances"), "w") as f:
             f.write(file_string)
             f.close()
-        print("Utterances file created!")
+        #print("Utterances file created!")
 
     @staticmethod
     def write_dialogue_list_to_file(dialogues, out_cwd):
@@ -36,7 +36,7 @@ class DataExtractor:
         with open(os.path.join(out_cwd, "dialogues.json"), "w") as f:
             f.write(dialogues_as_text)
             f.close()
-        print("Dialogues file created!")
+        #print("Dialogues file created!")
 
     def iterate_over_folders(self, parent_dir="", path=""):
         # Go over all files in the folder
